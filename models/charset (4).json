@@ -1,0 +1,22 @@
+{
+    "charset": "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz .,;:!?'-/()&",
+    "blank_index": 75,
+    "num_classes": 76,
+    "img_h": 32,
+    "img_w": 384,
+    "max_label_len": 64,
+    "batch_size": 128,
+    "epochs": 10,
+    "use_emnist": true,
+    "use_mjsynth": true,
+    "use_custom_dataset": true,
+    "custom_dataset_dir": "/kaggle/input/datasets/harnishkumarmakwana/23bt04000internship",
+    "custom_labels_csv": "/kaggle/input/datasets/harnishkumarmakwana/23bt04000internship/labels.csv",
+    "custom_image_dir": "/kaggle/input/datasets/harnishkumarmakwana/23bt04000internship/images",
+    "custom_limit": null,
+    "custom_val_ratio": 0.05,
+    "emnist_train_limit": 500000,
+    "emnist_val_limit": 20000,
+    "mjsynth_train_limit": 200000,
+    "mjsynth_val_limit": 20000
+}

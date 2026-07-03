@@ -1,0 +1,24 @@
+# docker-compose.gpu.yml
+# GPU override – merge on top of docker-compose.yml:
+#   docker compose -f deployment/docker-compose.yml \
+#                  -f deployment/docker-compose.gpu.yml up
+
+version: "3.9"
+
+services:
+  app:
+    build:
+      args:
+        USE_GPU: "1"
+    image: digitai:gpu
+    environment:
+      TF_FORCE_GPU_ALLOW_GROWTH: "true"
+      NVIDIA_VISIBLE_DEVICES:    all
+      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

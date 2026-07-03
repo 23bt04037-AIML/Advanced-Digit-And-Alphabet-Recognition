@@ -1,0 +1,7 @@
+model,optimizer,accuracy_percent,macro_f1,epochs_completed,train_samples,test_samples,passed_95_target,model_file
+cnn_deep,adam,99.28,0.9928,20,80000,13000,True,E:\Week 2\models\cnn_deep_adam.keras
+cnn_deep,nadam,99.23,0.9922,20,80000,13000,True,E:\Week 2\models\cnn_deep_nadam.keras
+cnn_deep,rmsprop,99.09,0.9909,20,80000,13000,True,E:\Week 2\models\cnn_deep_rmsprop.keras
+cnn_medium,adam,99.04,0.9903,20,80000,13000,True,E:\Week 2\models\cnn_medium_adam.keras
+cnn_medium,nadam,98.98,0.9897,20,80000,13000,True,E:\Week 2\models\cnn_medium_nadam.keras
+cnn_medium,rmsprop,98.82,0.9881,17,80000,13000,True,E:\Week 2\models\cnn_medium_rmsprop.keras

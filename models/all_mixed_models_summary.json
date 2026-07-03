@@ -1,0 +1,68 @@
+[
+  {
+    "model": "cnn_medium",
+    "optimizer": "adam",
+    "accuracy_percent": 99.04,
+    "macro_f1": 0.9903,
+    "epochs_completed": 20,
+    "train_samples": 80000,
+    "test_samples": 13000,
+    "passed_95_target": true,
+    "model_file": "E:\\Week 2\\models\\cnn_medium_adam.keras"
+  },
+  {
+    "model": "cnn_medium",
+    "optimizer": "rmsprop",
+    "accuracy_percent": 98.82,
+    "macro_f1": 0.9881,
+    "epochs_completed": 17,
+    "train_samples": 80000,
+    "test_samples": 13000,
+    "passed_95_target": true,
+    "model_file": "E:\\Week 2\\models\\cnn_medium_rmsprop.keras"
+  },
+  {
+    "model": "cnn_medium",
+    "optimizer": "nadam",
+    "accuracy_percent": 98.98,
+    "macro_f1": 0.9897,
+    "epochs_completed": 20,
+    "train_samples": 80000,
+    "test_samples": 13000,
+    "passed_95_target": true,
+    "model_file": "E:\\Week 2\\models\\cnn_medium_nadam.keras"
+  },
+  {
+    "model": "cnn_deep",
+    "optimizer": "adam",
+    "accuracy_percent": 99.28,
+    "macro_f1": 0.9928,
+    "epochs_completed": 20,
+    "train_samples": 80000,
+    "test_samples": 13000,
+    "passed_95_target": true,
+    "model_file": "E:\\Week 2\\models\\cnn_deep_adam.keras"
+  },
+  {
+    "model": "cnn_deep",
+    "optimizer": "rmsprop",
+    "accuracy_percent": 99.09,
+    "macro_f1": 0.9909,
+    "epochs_completed": 20,
+    "train_samples": 80000,
+    "test_samples": 13000,
+    "passed_95_target": true,
+    "model_file": "E:\\Week 2\\models\\cnn_deep_rmsprop.keras"
+  },
+  {
+    "model": "cnn_deep",
+    "optimizer": "nadam",
+    "accuracy_percent": 99.23,
+    "macro_f1": 0.9922,
+    "epochs_completed": 20,
+    "train_samples": 80000,
+    "test_samples": 13000,
+    "passed_95_target": true,
+    "model_file": "E:\\Week 2\\models\\cnn_deep_nadam.keras"
+  }
+]

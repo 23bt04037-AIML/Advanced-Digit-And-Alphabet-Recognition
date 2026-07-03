@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Git
+.git/
+.gitignore
+
+# Test cache
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Logs (will be mounted as a volume)
+logs/
+*.log
+
+# Trained models – mount as volume at runtime
+# models/   ← Keep this! We COPY models into the image
+
+# Database (will be a volume)
+*.db
+*.sqlite
+
+# Reports (generated at runtime)
+reports/
+
+# Node / frontend build artefacts
+node_modules/
+dist/
+build/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.pem
+*.key
+
+# Large data files
+data/
+datasets/
+*.csv
+*.xlsx
+
+# Streamlit cache
+.streamlit/cache/

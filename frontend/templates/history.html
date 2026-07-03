@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History – DigitAI</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary-dark shadow-sm">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand fw-bold" href="/"><i class="fas fa-brain me-2"></i>DigitAI</a>
+    <div class="d-flex gap-3">
+      <a href="/"          class="nav-link text-white-50"><i class="fas fa-pen me-1"></i>Predict</a>
+      <a href="/dashboard" class="nav-link text-white-50"><i class="fas fa-chart-bar me-1"></i>Dashboard</a>
+      <a href="/history"   class="nav-link text-white active"><i class="fas fa-history me-1"></i>History</a>
+
+      <a href="/docs"      class="nav-link text-white-50" target="_blank"><i class="fas fa-code me-1"></i>API</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container-fluid px-4 py-4">
+
+  <!-- Header + filters -->
+  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <h4 class="fw-bold mb-0"><i class="fas fa-history text-primary me-2"></i>Prediction History</h4>
+    <div class="d-flex gap-2 flex-wrap">
+      <select id="filterModel" class="form-select form-select-sm" style="width:160px"
+              onchange="applyFilters()">
+        <option value="">All Models</option>
+        <option value="cnn_small">CNN Small</option>
+        <option value="cnn_medium">CNN Medium</option>
+        <option value="cnn_deep">CNN Deep</option>
+        <option value="mobilenetv2">MobileNetV2</option>
+        <option value="resnet50">ResNet50</option>
+      </select>
+      <select id="filterDigit" class="form-select form-select-sm" style="width:130px"
+              onchange="applyFilters()">
+        <option value="">All Digits</option>
+        <option value="0">0</option><option value="1">1</option>
+        <option value="2">2</option><option value="3">3</option>
+        <option value="4">4</option><option value="5">5</option>
+        <option value="6">6</option><option value="7">7</option>
+        <option value="8">8</option><option value="9">9</option>
+      </select>
+      <a href="/api/dashboard/export/csv" class="btn btn-sm btn-outline-secondary">
+        <i class="fas fa-download me-1"></i>CSV
+      </a>
+    </div>
+  </div>
+
+  <!-- Table card -->
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover table-striped mb-0 align-middle" id="historyTable">
+          <thead class="table-dark">
+            <tr>
+              <th>#</th>
+              <th>Preview</th>
+              <th>Digit</th>
+              <th>Confidence</th>
+              <th>Top-3</th>
+              <th>Model</th>
+              <th>Type</th>
+              <th>Time (ms)</th>
+              <th>Correct</th>
+              <th>Date</th>
+              <th>XAI</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody">
+            <tr><td colspan="11" class="text-center text-muted py-4">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <span id="paginationInfo" class="small text-muted"></span>
+      <nav>
+        <ul class="pagination pagination-sm mb-0" id="pagination"></ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- XAI Modal -->
+<div class="modal fade" id="xaiModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="fas fa-fire text-danger me-2"></i>XAI Heatmaps</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3" id="modalXaiImages"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+let currentPage = 1;
+const perPage   = 20;
+
+async function loadHistory(page = 1) {
+  const model = document.getElementById("filterModel").value;
+  const digit = document.getElementById("filterDigit").value;
+  let url = `/api/predict/history?page=${page}&per_page=${perPage}`;
+  if (model) url += `&model_name=${model}`;
+  if (digit !== "") url += `&digit=${digit}`;
+
+  const data = await fetch(url).then(r => r.json());
+  currentPage = page;
+  renderTable(data.records);
+  renderPagination(data.total, data.pages, page);
+  document.getElementById("paginationInfo").textContent =
+    `Showing ${(page-1)*perPage+1}–${Math.min(page*perPage, data.total)} of ${data.total} records`;
+}
+
+function renderTable(records) {
+  const tbody = document.getElementById("historyBody");
+  if (!records.length) {
+    tbody.innerHTML = '<tr><td colspan="11" class="text-center text-muted py-4">No records found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = records.map(r => {
+    const confColor = r.confidence >= 90 ? "success" : r.confidence >= 70 ? "warning" : "danger";
+    const top3 = (r.top3_predictions || [])
+      .map(t => `<span class="badge bg-secondary me-1">${t.digit}:${t.confidence.toFixed(1)}%</span>`)
+      .join("");
+    const previewSrc = r.image_path ? `/${r.image_path}` : "";
+    const preview = previewSrc
+      ? `<img src="${previewSrc}" class="hist-thumb" alt="img">`
+      : `<div class="hist-thumb-placeholder">${r.predicted_digit}</div>`;
+    const correct = r.is_correct === null ? "–"
+      : r.is_correct ? '<span class="badge bg-success">✓</span>'
+                     : `<span class="badge bg-danger">✗ (${r.true_label ?? "?"})</span>`;
+    const xaiBtn = (r.gradcam_path || r.saliency_path)
+      ? `<button class="btn btn-xs btn-outline-danger" onclick='showXAI(${JSON.stringify(r)})'>
+           <i class="fas fa-fire"></i></button>`
+      : "–";
+    return `
+      <tr>
+        <td class="text-muted small">${r.id}</td>
+        <td>${preview}</td>
+        <td><span class="digit-badge">${r.predicted_digit}</span></td>
+        <td><span class="badge bg-${confColor}">${r.confidence?.toFixed(1)}%</span></td>
+        <td>${top3}</td>
+        <td><span class="badge bg-dark">${r.model_used}</span></td>
+        <td><span class="badge bg-info text-dark">${r.input_type}</span></td>
+        <td class="small">${r.processing_time_ms?.toFixed(1) ?? "–"}</td>
+        <td>${correct}</td>
+        <td class="small text-muted">${(r.created_at || "").slice(0,16)}</td>
+        <td>${xaiBtn}</td>
+      </tr>`;
+  }).join("");
+}
+
+function renderPagination(total, pages, current) {
+  const ul = document.getElementById("pagination");
+  if (pages <= 1) { ul.innerHTML = ""; return; }
+  const items = [];
+  items.push(`<li class="page-item ${current===1?'disabled':''}">
+    <a class="page-link" href="#" onclick="loadHistory(${current-1})">‹</a></li>`);
+  for (let p = Math.max(1, current-2); p <= Math.min(pages, current+2); p++) {
+    items.push(`<li class="page-item ${p===current?'active':''}">
+      <a class="page-link" href="#" onclick="loadHistory(${p})">${p}</a></li>`);
+  }
+  items.push(`<li class="page-item ${current===pages?'disabled':''}">
+    <a class="page-link" href="#" onclick="loadHistory(${current+1})">›</a></li>`);
+  ul.innerHTML = items.join("");
+}
+
+function applyFilters() { loadHistory(1); }
+
+function showXAI(record) {
+  const container = document.getElementById("modalXaiImages");
+  container.innerHTML = "";
+  const items = [
+    { label: "Grad-CAM", path: record.gradcam_path },
+    { label: "Saliency", path: record.saliency_path },
+    { label: "Original", path: record.image_path },
+  ];
+  items.forEach(({ label, path }) => {
+    if (!path) return;
+    container.innerHTML += `
+      <div class="col-md-4 text-center">
+        <p class="small fw-semibold mb-1">${label}</p>
+        <img src="/${path}" class="img-fluid rounded shadow-sm" alt="${label}">
+      </div>`;
+  });
+  new bootstrap.Modal(document.getElementById("xaiModal")).show();
+}
+
+loadHistory(1);
+</script>
+</body>
+</html>

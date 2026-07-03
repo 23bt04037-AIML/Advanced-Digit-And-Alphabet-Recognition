@@ -1,0 +1,16 @@
+{
+    "charset": "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+    "blank_index": 62,
+    "num_classes": 63,
+    "img_h": 32,
+    "img_w": 384,
+    "max_label_len": 48,
+    "batch_size": 64,
+    "emnist_limit": 300000,
+    "svhn_limit": 200000,
+    "mjsynth_limit": 100000,
+    "synth_text_limit": 80000,
+    "synth_emnist_seq_limit": 60000,
+    "synth_svhn_seq_limit": 40000,
+    "transfer_learning": false
+}

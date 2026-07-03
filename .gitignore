@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+venv311/
+*.egg-info/
+dist/
+build/
+
+# Environment
+.env
+!.env.example
+
+digit_recognition.db
+
+# Models (large files – use DVC or Git LFS)
+models/*.keras
+models/*.keras.bak
+models/*.h5
+models/*.tflite
+
+# Generated assets
+frontend/static/uploads/*
+frontend/static/heatmaps/*
+frontend/static/plots/*
+!frontend/static/uploads/.gitkeep
+!frontend/static/heatmaps/.gitkeep
+!frontend/static/plots/.gitkeep
+
+# Reports
+reports/
+
+# Logs
+logs/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Docker
+deployment/.env
+
+# TensorBoard
+runs/
+
+# OS
+.DS_Store
+Thumbs.db
