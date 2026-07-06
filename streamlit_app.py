@@ -9,7 +9,22 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from pathlib import Path
 import numpy as np
-import pymysql
+
+# ==========================================================
+# STREAMLIT CLOUD DEMO MODE
+# ==========================================================
+# Keep this True for Streamlit Cloud deployment.
+# It disables login/register/MySQL/history/admin pages and opens
+# the prediction app directly.
+#
+# For local full app with MySQL, set environment variable:
+# CLOUD_MODE=0
+CLOUD_MODE = os.getenv("CLOUD_MODE", "1").strip().lower() not in {"0", "false", "no", "off"}
+
+if not CLOUD_MODE:
+    import pymysql
+else:
+    pymysql = None
 
 ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT))
@@ -610,6 +625,8 @@ def load_prediction_service():
 
 @st.cache_resource(show_spinner="Connecting to database…")
 def load_db():
+    if CLOUD_MODE:
+        raise RuntimeError("Database is disabled in Streamlit Cloud demo mode.")
     from backend.database.db import SessionLocal, create_tables, check_connection
     check_connection(); create_tables(); _ensure_admin_exists()
     return SessionLocal
@@ -1573,6 +1590,9 @@ def _save_prediction(result, image_arr, input_type, xai_on, user):
     Save single digit prediction in the old PredictionLog table
     and also in UniversalPredictionLog so user/admin history can show all records together.
     """
+    if CLOUD_MODE:
+        # Streamlit Cloud demo mode has no MySQL database.
+        return
     try:
         SL = load_db()
         from backend.database.models import PredictionLog
@@ -1641,6 +1661,8 @@ def _save_prediction(result, image_arr, input_type, xai_on, user):
 
 
 def _submit_feedback(is_correct, true_label):
+    if CLOUD_MODE:
+        return
     try:
         SL = load_db()
         from backend.database.models import PredictionLog
@@ -1682,6 +1704,9 @@ def _save_universal_prediction(
     extra_data=None,
 ):
     """Save any prediction type to universal_prediction_logs."""
+    if CLOUD_MODE:
+        # Streamlit Cloud demo mode has no MySQL database.
+        return
     try:
         SL = load_db()
         from backend.database.models import UniversalPredictionLog
@@ -3769,6 +3794,37 @@ def page_admin_test_prediction(user):
 # MAIN  –  navigation router
 # ══════════════════════════════════════════════════════════════════════════════
 def main():
+    # ======================================================
+    # STREAMLIT CLOUD DEMO MODE
+    # ======================================================
+    # Directly opens the prediction pages without login,
+    # register, MySQL, admin dashboard, or history pages.
+    if CLOUD_MODE:
+        demo_user = {
+            "id": 0,
+            "username": "guest",
+            "role": "client",
+            "full_name": "Guest User",
+            "email": "",
+        }
+        st.session_state.setdefault("session_id", uuid.uuid4().hex)
+
+        _render_navbar(demo_user)
+        st.info("🌐 Demo Mode: Login, register, MySQL database, history, and admin pages are temporarily disabled for Streamlit Cloud.")
+
+        t1, t2 = st.tabs([
+            "🖊️ Canvas Prediction",
+            "📁 Upload Prediction",
+        ])
+
+        with t1:
+            page_canvas_prediction(demo_user)
+
+        with t2:
+            page_upload_prediction(demo_user)
+
+        return
+
     user = st.session_state.get("auth_user")
 
     # ── Not logged in → public pages only ────────────────────────────────────
